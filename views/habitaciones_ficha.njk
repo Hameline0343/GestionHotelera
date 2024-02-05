@@ -1,0 +1,61 @@
+{% extends "base.njk" %}
+
+{% block titulo %}Habitaciones | Ficha{% endblock %}
+
+{% block contenido %}
+
+    <h1>Ficha de habitación {{ habitacion.numero }}</h1>
+    {% if habitacion.imagen %}
+        <p><img src="/public/uploads/{{ habitacion.imagen }}"></p>
+    {% endif %}
+    <p>Tipo {{ habitacion.tipo }} - <strong>{{ habitacion.precio }} eur/noche</strong></p>
+    <p>{{ habitacion.descripcion }}</p>
+    {% if session and session.usuario %}
+        <form action="/habitaciones/editar/{{ habitacion.id }}" method="get">
+            <button type="submit" class="btn btn-success">Editar habitación</button>
+        </form>
+        <form action="/habitaciones/{{ habitacion.id }}/borrar" method="post">
+            <button type="submit" class="btn btn-danger">Borrar habitación</button>
+        </form>
+    {% endif %}
+    <h2>Incidencias</h2>
+    {% if session and session.usuario %}
+        <h3>Nueva incidencia</h3>
+        <form action="/habitaciones/{{ habitacion.id }}/incidencias" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="descripcion">Descripcion de la incidencia:</label>
+                <input type="text" class="form-control" name="descripcion" 
+                    placeholder="Descripcion de la incidencia...">
+            </div>
+            <div class="form-group">
+                <label for="imagen">Imagen:</label>
+                <input type="file" class="form-control" name="imagen"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+    {% endif %}
+    <div class="row">
+        {% for incidencia in habitacion.incidencias %}
+            <div class="border col-12 rounded">
+                <p>(<em>{{ incidencia.fechaInicio.getDate() ~ '/' ~ (incidencia.fechaInicio.getMonth() + 1) ~ '/' ~ incidencia.fechaInicio.getFullYear() }}</em>)</p>
+                {% if incidencia.imagen %}
+                    <p><img src="/public/uploads/{{ incidencia.imagen }}"></p>
+                {% endif %}
+                <p>{{ incidencia.descripcion }}</p>
+                {% if not incidencia.fechaFin %}
+                    {% if session and session.usuario %}
+                        <form action="/habitaciones/{{ habitacion.id }}/incidencias/{{ incidencia.id }}" method="post">
+                            <button type="submit" class="btn btn-danger">Cerrar</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p class="text-success">Cerrada el <em>{{ incidencia.fechaFin.getDate() ~ '/' ~ (incidencia.fechaFin.getMonth() + 1) ~ '/' ~ incidencia.fechaFin.getFullYear() }}</em></p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p>No hay incidencias.</p>
+        {% endfor %}
+    </div>
+    <h2>Limpiezas</h2>
+    <a class="btn btn-primary" href="/limpiezas/{{ habitacion.id }}">Ver limpiezas</a>
+{% endblock %}

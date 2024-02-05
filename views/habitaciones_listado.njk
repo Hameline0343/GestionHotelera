@@ -1,0 +1,21 @@
+{% extends "base.njk" %}
+
+{% block titulo %}Habitaciones | Listado{% endblock %}
+
+{% block contenido %}
+
+    <h1>Listado de habitaciones</h1>
+
+    <ul class="list-unstyled row">
+        {% for habitacion in habitaciones %}
+            <div class="border col-3 m-2">
+                <li>Habitación {{ habitacion.numero }}</li>
+                <li>Última limpieza: {{ habitacion.ultimaLimpieza.getDate() ~ '/' ~ (habitacion.ultimaLimpieza.getMonth() + 1) ~ '/' ~ habitacion.ultimaLimpieza.getFullYear() }}</li>
+                <a class="btn btn-primary" href="/habitaciones/{{ habitacion.id }}">Ver ficha</a>
+            </div>
+        {% else %}
+            <p>No hay habitaciones existentes.</p>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
