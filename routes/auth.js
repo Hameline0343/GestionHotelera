@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
 router.get('/logout', (req, res) => {
     req.session.destroy();
     res.locals.session.usuario = undefined;
-    res.render('login');
+    res.redirect('/auth/login');
 });
 
 module.exports = router;
