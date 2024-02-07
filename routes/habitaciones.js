@@ -132,8 +132,8 @@ router.post('/:id/incidencias', auth.autenticacion, upload.upload.single('imagen
       { descripcion: req.body.descripcion, fechaInicio: new Date(), imagen: req.file.filename } : 
       { descripcion: req.body.descripcion, fechaInicio: new Date() };
     habitacion.incidencias.push(incidencia);
-    
-    res.redirect('habitaciones_ficha', {habitacion});
+    await habitacion.save();
+    res.render('habitaciones_ficha', {habitacion});
   } catch (error) {
     res.render('error', {error: 'Error añadiendo la incidencia: ' + error})
   }
@@ -152,7 +152,8 @@ router.post('/:idH/incidencias/:idI', auth.autenticacion, async (req, res) => {
     if (!incidencia) 
       res.render('error', {error: 'Incidencia no encontrada.'});
 
-    incidencia.fechaFin = new Date();
+      habitacion.incidencias.id(req.params.idI).fechaFin = new Date();
+      await habitacion.save();
     res.redirect('/habitaciones/'+req.params.idH);
   } catch (error) {
     res.render('error', {error: 'Error actualizando la incidencia: ' + error})
