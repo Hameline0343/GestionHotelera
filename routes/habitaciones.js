@@ -86,16 +86,16 @@ router.post('/editar/:id', auth.autenticacion, upload.upload.single('imagen'), a
   try {
     const habitacion = await Habitacion.findById(req.params.id);
     const tipoEnum = ["individual", "doble", "familiar", "suite"];
-    const habitacionActualizada = await Habitacion.findByIdAndUpdate(req.params.id, {$set: {
+    await Habitacion.findByIdAndUpdate(req.params.id, {$set: {
       numero: req.body.numero !== undefined && req.body.numero >= 1 && req.body.numero <= 100 ? req.body.numero : habitacion.numero, 
       descripcion: req.body.descripcion ?? habitacion.descripcion, 
       tipo: req.body.tipo !== undefined && tipoEnum.includes(req.body.tipo) ? req.body.tipo : habitacion.tipo, 
       precio: req.body.precio !== undefined && req.body.precio >= 0 && req.body.precio <= 250 ? req.body.precio : habitacion.precio,
       imagen: req.file?.filename ?? habitacion.imagen
-    }}, {new: true});
+    }});
     //Me he dado cuenta tarde del run validators ', runValidators: true'.
     //El aspecto positivo de hacerlo así es que incluso si se meten algunos datos erróneos los que no lo son se siguen enviando.
-    res.render('habitaciones_ficha', {habitacion: habitacionActualizada});
+    res.redirect('/habitaciones/'+req.params.id);
   }
   catch(error){
     let errores = {
@@ -114,12 +114,7 @@ router.post('/:id/borrar', auth.autenticacion,  async (req, res) => {
       res.render('error', { error: 'Error eliminando la habitación' });
     else {
       await Limpieza.deleteMany({ idHabitacion: req.params.id });
-        
-      const habitaciones = await Habitacion.find();
-      if(habitaciones)
-        res.render('habitaciones_listado', {habitaciones});
-      else
-        res.render('error', {error: 'Error obteniendo listado de habitaciones'});
+      res.redirect('/habitaciones/');
     }
   } catch (error) {
     res.render('error', { error: 'Error eliminando la habitación: '});
@@ -138,9 +133,7 @@ router.post('/:id/incidencias', auth.autenticacion, upload.upload.single('imagen
       { descripcion: req.body.descripcion, fechaInicio: new Date() };
     habitacion.incidencias.push(incidencia);
     
-    const habitacionActualizada = await habitacion.save();
-
-    res.render('habitaciones_ficha', {habitacion: habitacionActualizada});
+    res.redirect('/habitaciones/'+req.params.id);
   } catch (error) {
     res.render('error', {error: 'Error añadiendo la incidencia: ' + error})
   }
@@ -160,8 +153,7 @@ router.post('/:idH/incidencias/:idI', auth.autenticacion, async (req, res) => {
       res.render('error', {error: 'Incidencia no encontrada.'});
 
     incidencia.fechaFin = new Date();
-    const habitacionActualizada = await habitacion.save();
-    res.render('habitaciones_ficha', { habitacion: habitacionActualizada });
+    res.redirect('/habitaciones/'+req.params.idH);
   } catch (error) {
     res.render('error', {error: 'Error actualizando la incidencia: ' + error})
   }
