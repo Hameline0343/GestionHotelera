@@ -19,8 +19,7 @@ router.post('/login', async (req, res) => {
         if (usuario)
         {
             req.session.usuario = usuario.login;
-            const habitaciones = await Habitacion.find();
-            res.render('habitaciones_listado', {habitaciones});
+            res.redirect('/habitaciones/');
         } 
         else
             res.render('login', {error: "Usuario o contraseña incorrectos"});
