@@ -133,7 +133,7 @@ router.post('/:id/incidencias', auth.autenticacion, upload.upload.single('imagen
       { descripcion: req.body.descripcion, fechaInicio: new Date() };
     habitacion.incidencias.push(incidencia);
     
-    res.redirect('/habitaciones/'+req.params.id);
+    res.redirect('habitaciones_ficha', {habitacion});
   } catch (error) {
     res.render('error', {error: 'Error añadiendo la incidencia: ' + error})
   }
